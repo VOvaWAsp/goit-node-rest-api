@@ -2,8 +2,8 @@ import path from "path"
 import {promises as fs} from "fs"
 import { nanoid } from "nanoid";
 
-import { createContactSchema, updateContactSchema } from "../schemas/ contactsSchemas.js";
-import { getContactById, listContacts, removeContact } from "../services/ contactsServices.js";
+import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
+import { getContactById, listContacts, removeContact } from "../services/contactsServices.js";
 import validateBody from "../helpers/validateBody.js";
 import HttpError from "../helpers/HttpError.js";
 // import contactsService from "../services/contactsServices.js";
