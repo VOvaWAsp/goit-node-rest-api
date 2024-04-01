@@ -44,10 +44,6 @@ export const deleteContact = async(req, res) => {
 export const createContact = async(req, res) => {
 const { value, errors } = createContactSchema.validate(req.body);
 
-if (errors) {
-    validateBody(errors);
-};
-
 const { name, email, phone }= value;
 
 try {
