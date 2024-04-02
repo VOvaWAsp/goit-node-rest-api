@@ -3,91 +3,66 @@ import {promises as fs} from "fs"
 import { nanoid } from "nanoid";
 
 import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
-import { getContactById, listContacts, removeContact } from "../services/contactsServices.js";
-import validateBody from "../helpers/validateBody.js";
+import { addContact, getContactById, listContacts, removeContact, updateContactById } from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
-// import contactsService from "../services/contactsServices.js";
 
 const contactsPath = path.join("db", "contacts.json");
 
-export const getAllContacts = async(req, res) => {
-    const getUsers = await listContacts();
-    res.status(200).json({
-        msg: 'success',
-        users: getUsers,
-    })
+export const getAllContacts = async(req, res, next) => {
+   const getUsers = await listContacts();
+    res.json(getUsers);
 };
 
 export const getOneContact = async(req, res) => {
     const { id } = req.params;
     const getUser = await getContactById(id);
     
-    HttpError(404, {message: "Not found"})
-
-    res.status(200).json({
-        msg: 'success',
-        users: getUser,
-    })};
+  if (!getUser) {
+   res.status(404).json({"message": "Not found"})
+    }
+  res.json(getUser)
+};
 
 export const deleteContact = async(req, res) => {
     const { id } = req.params;
     const removeContacted = await removeContact(id);
 
-    HttpError(404, {message: "Not found"});
-
-    res.status(200).json({
-        msg: "success",
-        user: removeContacted
-    })
+    if (!removeContacted) {
+        res.status(404).json({"message": "Not found"})
+         }
+       res.json(removeContacted)
 };
 
 export const createContact = async(req, res) => {
-const { value, errors } = createContactSchema.validate(req.body);
+// const { value, errors } = createContactSchema.validate(req.body);
+const createNewContcat = await addContact(req.body);
 
-const { name, email, phone }= value;
+// const { name, email, phone }= value;
 
-try {
-    const addJsonById = await fs.readFile(contactsPath);
-    const contacts = JSON.parse(addJsonById);
-    const newContact = { id: nanoid(), name, email, phone };
-    contacts.push(newContact);
-    await fs.writeFile(contactsPath, JSON.stringify(contacts));
+// try {
+    // const addJsonById = await fs.readFile(contactsPath);
+    // const contacts = JSON.parse(addJsonById);
+    // const newContact = { id: nanoid(), name, email, phone };
+    // contacts.push(newContact);
+    // await fs.writeFile(contactsPath, JSON.stringify(contacts));
 
-    res.status(201).json({
-        msg: "success",
-        user: newContact,
-    });
-} catch (err) {
-        console.error('Error creating contact:', err);
-        res.status(500).json({ error: 'Server error' });
-    }
+    res.status(201).json(createNewContcat);
+// } catch (err) {
+    //     console.error('Error creating contact:', err);
+    //     res.status(500).json({ error: 'Server error' });
+    // // }
 };
 
 export const updateContact = async(req, res) => {
-    const { id } = req.params;
-    const { value, errors } = updateContactSchema.validate(req.body);
-
-    if (errors) {
-        HttpError(400, {"message": "Body must have at least one field"});
-    }
-
-    const { name, email, phone } = value;
-
-    try {
-    const updateJsonById = await fs.readFile(contactsPath);
-    const get = JSON.parse(updateJsonById)
-    const find = get.filter((item) => item.id === id)
-    if (!find) {
-       return null
-    }
-    const update = { ...get[find], id, name, email, phone}
-    await fs.writeFile(contactsPath, JSON.stringify(get))
-    res.status(200).json({
-        msg: "success",
-        users: update,
-    })
-} catch (err) {
-    console.error('Error creating contact:', err);
-    res.status(500).json({ error: 'Server error' });
+const { id } = req.params;
+if (Object.keys(req.body).length === 0) {
+    res.status(400).json({"message": "Body must have at least one field"})
 }
+const updateContacts = await updateContactById(id, req.body);
+if (!updateContacts) {
+    res.status(404).json({"message": "Not found"})
+            // res.status(400).json({"message": "Body must have at least one field"});
+};
+
+res.json(updateContacts);
 };
