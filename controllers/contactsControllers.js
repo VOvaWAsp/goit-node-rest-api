@@ -1,12 +1,6 @@
 import path from "path"
-import {promises as fs} from "fs"
-import { nanoid } from "nanoid";
 
-import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
 import { addContact, getContactById, listContacts, removeContact, updateContactById } from "../services/contactsServices.js";
-import HttpError from "../helpers/HttpError.js";
-
-const contactsPath = path.join("db", "contacts.json");
 
 export const getAllContacts = async(req, res, next) => {
    const getUsers = await listContacts();
@@ -34,23 +28,10 @@ export const deleteContact = async(req, res) => {
 };
 
 export const createContact = async(req, res) => {
-// const { value, errors } = createContactSchema.validate(req.body);
+
 const createNewContcat = await addContact(req.body);
 
-// const { name, email, phone }= value;
-
-// try {
-    // const addJsonById = await fs.readFile(contactsPath);
-    // const contacts = JSON.parse(addJsonById);
-    // const newContact = { id: nanoid(), name, email, phone };
-    // contacts.push(newContact);
-    // await fs.writeFile(contactsPath, JSON.stringify(contacts));
-
     res.status(201).json(createNewContcat);
-// } catch (err) {
-    //     console.error('Error creating contact:', err);
-    //     res.status(500).json({ error: 'Server error' });
-    // // }
 };
 
 export const updateContact = async(req, res) => {
