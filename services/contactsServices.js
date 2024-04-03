@@ -12,7 +12,7 @@ export async function listContacts() {
   export async function getContactById(contactId) {
     const getJsonById = await listContacts();
     const find = getJsonById.find((item) => item.id === contactId)
-    return find || null;
+    return find;
 }
   
   export async function removeContact(contactId) {

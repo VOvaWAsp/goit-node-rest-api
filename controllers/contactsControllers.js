@@ -22,7 +22,7 @@ export const deleteContact = async(req, res) => {
     const removeContacted = await removeContact(id);
 
     if (!removeContacted) {
-        res.status(404).json({"message": "Not found"})
+       return res.status(404).json({"message": "Not found"})
          }
        res.json(removeContacted)
 };
@@ -37,12 +37,11 @@ const createNewContcat = await addContact(req.body);
 export const updateContact = async(req, res) => {
 const { id } = req.params;
 if (Object.keys(req.body).length === 0) {
-    res.status(400).json({"message": "Body must have at least one field"})
+   return res.status(400).json({"message": "Body must have at least one field"})
 }
 const updateContacts = await updateContactById(id, req.body);
 if (!updateContacts) {
-    res.status(404).json({"message": "Not found"})
-            // res.status(400).json({"message": "Body must have at least one field"});
+   return res.status(404).json({"message": "Not found"})
 };
 
 res.json(updateContacts);
