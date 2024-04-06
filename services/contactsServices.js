@@ -1,6 +1,7 @@
 import {promises as fs} from "fs"
 import { nanoid } from "nanoid";
 import path from "path"
+import { model, Schema, Types } from "mongoose";
 
 const contactsPath = path.join("db", "contacts.json");
 
@@ -54,3 +55,26 @@ export async function updateContactById(id, {name, email, phone}) {
   await fs.writeFile(contactsPath, JSON.stringify(contact, null, 2));
   return contact[find];
 }
+
+const contactSchema = new Schema({
+  name: {
+    type: String,
+    required: [true, 'Set name for contact'],
+  },
+  email: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
+  },
+},
+{
+  timestamps: true,
+  versionKey: false,
+})
+
+export const Contact = model('Contact', contactSchema);
