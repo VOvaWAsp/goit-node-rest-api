@@ -53,9 +53,11 @@ if (Object.keys(req.body).length === 0) {
     return res.status(400).json({"message": "Body must have at least one field"})
  }
 
-const updateContacts = await Contact.findByIdAndUpdate(id, req.body);
+const updateContacts = await Contact.findByIdAndUpdate(id, req.body, {new: true,});
 
-res.json(updateContacts);
+if (!updateContacts) return res.status(404).json({"message": "Not found"});
+
+return res.json(updateContacts);
 };
 
 export const updateStatusContact = async(req, res) => {
@@ -65,7 +67,9 @@ export const updateStatusContact = async(req, res) => {
     
     if (!valid) return res.status(404).json({"message": "Not found"});
     
-    const updateContacts = await Contact.findByIdAndUpdate(id, req.body);
+    const updateFavorite = await Contact.findByIdAndUpdate(id, req.body, {new: true,});
+
+    if (!updateFavorite) return res.status(404).json({"message": "Not found"});
     
-    res.json(updateContacts);
+    return res.json(updateFavorite);
     };
