@@ -1,48 +1,75 @@
 import path from "path"
 
-import { addContact, getContactById, listContacts, removeContact, updateContactById } from "../services/contactsServices.js";
+import { addContact, Contact, getContactById, listContacts, removeContact, updateContactById } from "../services/contactsServices.js";
+import { Types } from "mongoose";
 
 export const getAllContacts = async(req, res, next) => {
-   const getUsers = await listContacts();
-    res.json(getUsers);
+    const contacts = await Contact.find();
+    res.json(contacts);
 };
 
 export const getOneContact = async(req, res) => {
-    const { id } = req.params;
-    const getUser = await getContactById(id);
-    
-  if (!getUser) {
-   res.status(404).json({"message": "Not found"})
-    }
-  res.json(getUser)
+const { id } = req.params;
+
+const valid = Types.ObjectId.isValid(id);
+
+if (!valid) return res.status(404).json({"message": "Not found"});
+
+const contact = await Contact.findById(id);
+
+if (!contact) return res.status(404).json({"message": "Not found"});
+res.json(contact);
 };
 
 export const deleteContact = async(req, res) => {
     const { id } = req.params;
-    const removeContacted = await removeContact(id);
 
-    if (!removeContacted) {
-       return res.status(404).json({"message": "Not found"})
-         }
-       res.json(removeContacted)
+    const valid = Types.ObjectId.isValid(id);
+    
+    if (!valid) return res.status(404).json({"message": "Not found"});
+
+    const removeContacted = await Contact.findByIdAndDelete(id);
+
+    if (!removeContacted) return res.status(404).json({"message": "Not found"});
+        
+    res.json(removeContacted);
 };
 
 export const createContact = async(req, res) => {
 
-const createNewContcat = await addContact(req.body);
+const createNewContcat = await Contact.create(req.body);
 
     res.status(201).json(createNewContcat);
 };
 
 export const updateContact = async(req, res) => {
 const { id } = req.params;
+
+const valid = Types.ObjectId.isValid(id);
+
+if (!valid) return res.status(404).json({"message": "Not found"});
+
 if (Object.keys(req.body).length === 0) {
-   return res.status(400).json({"message": "Body must have at least one field"})
-}
-const updateContacts = await updateContactById(id, req.body);
-if (!updateContacts) {
-   return res.status(404).json({"message": "Not found"})
+    return res.status(400).json({"message": "Body must have at least one field"})
+ }
+
+const updateContacts = await Contact.findByIdAndUpdate(id, req.body, {new: true,});
+
+if (!updateContacts) return res.status(404).json({"message": "Not found"});
+
+return res.json(updateContacts);
 };
 
-res.json(updateContacts);
-};
+export const updateStatusContact = async(req, res) => {
+    const { id } = req.params;
+    
+    const valid = Types.ObjectId.isValid(id);
+    
+    if (!valid) return res.status(404).json({"message": "Not found"});
+    
+    const updateFavorite = await Contact.findByIdAndUpdate(id, req.body, {new: true,});
+
+    if (!updateFavorite) return res.status(404).json({"message": "Not found"});
+    
+    return res.json(updateFavorite);
+    };
