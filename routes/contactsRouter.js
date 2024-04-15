@@ -9,9 +9,11 @@ import {
 } from "../controllers/contactsControllers.js";
 import { createContactSchema, updateContactSchema, updateFavoriteSchema } from "../schemas/contactsSchemas.js";
 import validateBody from "../helpers/validateBody.js";
+import { verifyToken } from "../helpers/midellwars.js";
 
 const contactsRouter = express.Router();
 
+contactsRouter.use(verifyToken)
 contactsRouter.get("/", getAllContacts);
 
 contactsRouter.get("/:id", getOneContact);

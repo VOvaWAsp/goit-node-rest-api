@@ -16,3 +16,17 @@ export const updateContactSchema = Joi.object({
 export const updateFavoriteSchema = Joi.object({
     favorite: Joi.boolean().required(),
 })
+
+export const createUserSchema = Joi.object({
+    email: Joi.string().email().required(),
+    phone: Joi.string().required(),
+})
+
+export const usersSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(4).required(),
+})
+
+export const updateSubscriptionSchema = Joi.object({
+    subscription: Joi.string().required(),
+})

@@ -2,10 +2,12 @@ import path from "path"
 
 import { addContact, Contact, getContactById, listContacts, removeContact, updateContactById } from "../services/contactsServices.js";
 import { Types } from "mongoose";
+import { queryParams } from "../helpers/midellwars.js";
 
 export const getAllContacts = async(req, res, next) => {
-    const contacts = await Contact.find();
-    res.json(contacts);
+    // const contacts = await Contact.find();
+    const query = await queryParams(req.query, req.user);
+    res.json(query);
 };
 
 export const getOneContact = async(req, res) => {
