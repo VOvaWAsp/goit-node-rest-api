@@ -14,16 +14,16 @@ import { verifyToken } from "../helpers/midellwars.js";
 const contactsRouter = express.Router();
 
 contactsRouter.use(verifyToken)
-contactsRouter.get("/", getAllContacts);
+contactsRouter.get("/",verifyToken, getAllContacts);
 
-contactsRouter.get("/:id", getOneContact);
+contactsRouter.get("/:id",verifyToken, getOneContact);
 
-contactsRouter.delete("/:id", deleteContact);
+contactsRouter.delete("/:id",verifyToken, deleteContact);
 
-contactsRouter.post("/", validateBody(createContactSchema), createContact);
+contactsRouter.post("/",verifyToken, validateBody(createContactSchema), createContact);
 
-contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
+contactsRouter.put("/:id",verifyToken, validateBody(updateContactSchema), updateContact);
 
-contactsRouter.patch("/:id/favorite", validateBody(updateFavoriteSchema), updateStatusContact);
+contactsRouter.patch("/:id/favorite",verifyToken, validateBody(updateFavoriteSchema), updateStatusContact);
 
 export default contactsRouter;

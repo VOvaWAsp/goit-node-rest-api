@@ -5,9 +5,13 @@ import { Types } from "mongoose";
 import { queryParams } from "../helpers/midellwars.js";
 
 export const getAllContacts = async(req, res, next) => {
-    // const contacts = await Contact.find();
-    const query = await queryParams(req.query, req.user);
-    res.json(query);
+    try {
+        const userId = req.user.id;
+        const query = await queryParams(req.query, userId);
+        res.json(query);
+    } catch (error) {
+        next(error);
+    }
 };
 
 export const getOneContact = async(req, res) => {
@@ -41,7 +45,21 @@ export const createContact = async(req, res) => {
 
 const createNewContcat = await Contact.create(req.body);
 
-    res.status(201).json(createNewContcat);
+const { name, email, phone, favorite, owner } = createNewContcat
+const owners = req.user;
+const ownered = owners.id;
+
+createNewContcat.owner = ownered;
+
+createNewContcat.save();
+
+    res.status(201).json({
+        name,
+        email,
+        phone,
+        favorite,
+        ownered,
+    });
 };
 
 export const updateContact = async(req, res) => {
