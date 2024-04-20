@@ -5,7 +5,7 @@ import { registerUser } from '../helpers/users.js';
 import { Types } from 'mongoose';
 
 export const registration = async(req, res) => {
-    const { newUser, token } = await registerUser(req.body);
+    const { newUser } = await registerUser(req.body);
     console.log(newUser)
     if (newUser === undefined) return res.status(404).json({ "message": "Email is already in use" })
     const { email, subscription } = newUser; 
@@ -49,12 +49,16 @@ export const logout = async(req, res) => {
    const token = req.user
    token.token = null
    await token.save()
-   res.json(token)
+   res.sendStatus(204);
 }
 
 export const current = async(req, res) => {
     const currentUser = req.user;
-   return res.json(currentUser)
+    const { email, subscription } = currentUser
+   return res.json({
+    email,
+    subscription
+   })
 }
 
 export const updateSubscription = async(req, res) => {

@@ -32,7 +32,7 @@ import HttpError from "./HttpError.js";
 //         next();
 // }
 
-export const tokens = (token) => {
+export const tokens = (token, res) => {
     try {
         const id = jwt.verify(token, process.env.SECRET);
         return id;
@@ -48,6 +48,8 @@ export const verifyToken = async(req, res, next) => {
 
         console.log(id)
 
+        if (token === '') return res.status(401).json({ message: 'Not authorized' });
+
         if (!id) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
@@ -58,10 +60,16 @@ export const verifyToken = async(req, res, next) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
+
+        if (currentUser.token === null) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
         req.user = currentUser;
         next();
     } catch (error) {
         console.error('Unauthorized');
+        return res.status(401).json({ message: 'Not authorized' });
     }
 }
 
