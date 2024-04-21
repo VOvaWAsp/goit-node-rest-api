@@ -36,7 +36,13 @@ export const deleteContact = async(req, res) => {
     
     if (!valid) return res.status(404).json({"message": "Not found"});
 
-    const removeContacted = await Contact.findByIdAndDelete(id);
+    const searchQuery = { _id: id, owner: req.user.id };
+
+    const contact = await Contact.findOne(searchQuery);
+
+    if (!contact) return res.status(404).json({"message": "Not found"});
+
+    const removeContacted = await Contact.findByIdAndDelete(contact);
 
     if (!removeContacted) return res.status(404).json({"message": "Not found"});
         
@@ -75,7 +81,13 @@ if (Object.keys(req.body).length === 0) {
     return res.status(400).json({"message": "Body must have at least one field"})
  }
 
-const updateContacts = await Contact.findByIdAndUpdate(id, req.body, {new: true,});
+ const searchQuery = { _id: id, owner: req.user.id };
+
+ const contact = await Contact.findOne(searchQuery);
+
+ if (!contact) return res.status(404).json({"message": "Not found"});
+
+const updateContacts = await Contact.findByIdAndUpdate(contact, req.body, {new: true,});
 
 if (!updateContacts) return res.status(404).json({"message": "Not found"});
 
@@ -88,8 +100,14 @@ export const updateStatusContact = async(req, res) => {
     const valid = Types.ObjectId.isValid(id);
     
     if (!valid) return res.status(404).json({"message": "Not found"});
+
+    const searchQuery = { _id: id, owner: req.user.id };
+
+ const contact = await Contact.findOne(searchQuery);
+
+ if (!contact) return res.status(404).json({"message": "Not found"});
     
-    const updateFavorite = await Contact.findByIdAndUpdate(id, req.body, {new: true,});
+    const updateFavorite = await Contact.findByIdAndUpdate(contact, req.body, {new: true,});
 
     if (!updateFavorite) return res.status(404).json({"message": "Not found"});
     
