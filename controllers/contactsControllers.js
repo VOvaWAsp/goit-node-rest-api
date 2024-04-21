@@ -14,17 +14,19 @@ export const getAllContacts = async(req, res, next) => {
     }
 };
 
-export const getOneContact = async(req, res) => {
-const { id } = req.params;
+export const getOneContact = async (req, res) => {
+    const { id } = req.params;
 
-const valid = Types.ObjectId.isValid(id);
+    const valid = Types.ObjectId.isValid(id);
 
-if (!valid) return res.status(404).json({"message": "Not found"});
+    if (!valid) return res.status(404).json({"message": "Not found"});
 
-const contact = await Contact.findById(id);
+    const searchQuery = { _id: id, owner: req.user.id };
 
-if (!contact) return res.status(404).json({"message": "Not found"});
-res.json(contact);
+    const contact = await Contact.findOne(searchQuery);
+
+    if (!contact) return res.status(404).json({"message": "Not found"});
+    res.json(contact);
 };
 
 export const deleteContact = async(req, res) => {
