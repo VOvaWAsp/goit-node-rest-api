@@ -9,19 +9,21 @@ import {
 } from "../controllers/contactsControllers.js";
 import { createContactSchema, updateContactSchema, updateFavoriteSchema } from "../schemas/contactsSchemas.js";
 import validateBody from "../helpers/validateBody.js";
+import { verifyToken } from "../helpers/midellwars.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+contactsRouter.use(verifyToken)
+contactsRouter.get("/",verifyToken, getAllContacts);
 
-contactsRouter.get("/:id", getOneContact);
+contactsRouter.get("/:id",verifyToken, getOneContact);
 
-contactsRouter.delete("/:id", deleteContact);
+contactsRouter.delete("/:id",verifyToken, deleteContact);
 
-contactsRouter.post("/", validateBody(createContactSchema), createContact);
+contactsRouter.post("/",verifyToken, validateBody(createContactSchema), createContact);
 
-contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
+contactsRouter.put("/:id",verifyToken, validateBody(updateContactSchema), updateContact);
 
-contactsRouter.patch("/:id/favorite", validateBody(updateFavoriteSchema), updateStatusContact);
+contactsRouter.patch("/:id/favorite",verifyToken, validateBody(updateFavoriteSchema), updateStatusContact);
 
 export default contactsRouter;
