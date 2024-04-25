@@ -3,6 +3,7 @@ import { User } from "../services/usersServices.js";
 import { Contact } from "../services/contactsServices.js";
 import HttpError from "./HttpError.js";
 
+
 // export const tokens = (token) => {
 //     try {
 //         const id = jwt.verify(token, process.env.SECRET);
@@ -93,65 +94,3 @@ export const queryParams = async (query, id) => {
 
     return queryResult;
 };
-
-// export const queryParams = async (query, id) => {
-//     const favoriteContacts = query.favorite === 'true';
-
-//     const searchQuery = { owner: id };
-
-//     if (favoriteContacts) {
-//         searchQuery.favorite = true;
-//     }
-
-//     const page = query.page ? +query.page : 1;
-//     const limit = query.limit ? +query.limit : 20;
-//     const skip = (page - 1) * limit;
-
-//     const queryResult = await Contact.find(searchQuery).skip(skip).limit(limit);
-
-//     return queryResult;
-// };
-
-// export const queryParams = async(query, contact) => {
-//     const queryParams = query.favorite === 'true' ? Contact.find({favorite: true}) : Contact.find()
-//     console.log(query)
-//     const page = query.page ? +query.page : 1;
-//     const limit = query.limit ? +query.limit : 20;
-//     const skip = ( page - 1 ) * limit;
-
-//     queryParams.skip(skip).limit(limit);
-
-//     const querys = await queryParams;
-//     return querys;
-// }
-
-// export const queryParams = async(query, contact) => {
-//     const queryParams = query.favorite === 'true' ? Contact.find({favorite: true}) && [] : Contact.find() && []
-//     console.log(query)
-//     const page = query.page ? +query.page : 1;
-//     const limit = query.limit ? +query.limit : 20;
-//     const skip = ( page - 1 ) * limit;
-
-//     queryParams.skip(skip).limit(limit);
-
-//     const querys = await queryParams;
-//     return querys;
-// }
-
-// export const queryParams = async (req, query, contact) => {
-//     const owner = req.user.id;
-
-//     console.log(owner)
-
-//     const queryParams = query.favorite === 'true' ? { owner, favorite: true } : { owner };
-
-//     console.log(queryParams);
-
-//     const page = query.page ? +query.page : 1;
-//     const limit = query.limit ? +query.limit : 20;
-//     const skip = (page - 1) * limit;
-
-//     const queryResult = await Contact.find(queryParams).skip(skip).limit(limit);
-
-//     return queryResult;
-// }

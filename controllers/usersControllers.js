@@ -1,18 +1,20 @@
 import jwt from 'jsonwebtoken';
 
 import { User } from "../services/usersServices.js"
-import { registerUser } from '../helpers/users.js';
+import { registerUser, updateAvatarImage } from '../helpers/users.js';
 import { Types } from 'mongoose';
 
 export const registration = async(req, res) => {
     const { newUser } = await registerUser(req.body);
+    console.log(req.body)
     console.log(newUser)
     if (newUser === undefined) return res.status(404).json({ "message": "Email is already in use" })
-    const { email, subscription } = newUser; 
+    const { email, subscription, avatarURL } = newUser; 
     return res.status(201).json({
         user: {
             email,
-            subscription
+            subscription,
+            avatarURL
         }
     });
 }
@@ -75,4 +77,12 @@ export const updateSubscription = async(req, res) => {
     await updateSubscriptions.save();
     
     return res.json(updateSubscriptions);
+}
+
+export const updateAvatar = async(req, res) => {
+    const user = await updateAvatarImage(req.user, req.file);
+   return res.json({
+        user,
+    });
+  
 }
