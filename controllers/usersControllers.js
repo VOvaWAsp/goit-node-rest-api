@@ -79,10 +79,14 @@ export const updateSubscription = async(req, res) => {
     return res.json(updateSubscriptions);
 }
 
-export const updateAvatar = async(req, res) => {
+export const updateAvatar = async(req, res, next) => {
+  try {
     const user = await updateAvatarImage(req.user, req.file);
-   return res.json({
-        user,
-    });
-  
+    return res.json({
+         user,
+     }); 
+  } catch(error) {
+    console.log(error);
+    next();
+  }
 }

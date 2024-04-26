@@ -1,9 +1,8 @@
 import express from "express"
 import { current, login, logout, registration, updateAvatar, updateSubscription } from "../controllers/usersControllers.js";
-import { verifyToken } from "../helpers/midellwars.js";
+import { uploadAvatars, verifyToken } from "../helpers/midellwars.js";
 import validateBody from "../helpers/validateBody.js";
 import { updateSubscriptionSchema, usersSchema } from "../schemas/contactsSchemas.js";
-import { uploadAvatars } from "../tmp/tmp.js";
 
 const usersRouter = express.Router();
 

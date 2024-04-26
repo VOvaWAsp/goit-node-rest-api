@@ -2,6 +2,9 @@ import jwt from "jsonwebtoken"
 import { User } from "../services/usersServices.js";
 import { Contact } from "../services/contactsServices.js";
 import HttpError from "./HttpError.js";
+import multer from "multer";
+import path from "path"
+import Jimp from "jimp";
 
 
 // export const tokens = (token) => {
@@ -78,8 +81,6 @@ export const verifyToken = async(req, res, next) => {
 export const queryParams = async (query, id) => {
     const favoriteContacts = query.favorite === 'true';
 
-    console.log(id)
-
     const searchQuery = { owner: id };
 
     if (favoriteContacts) {
@@ -94,3 +95,35 @@ export const queryParams = async (query, id) => {
 
     return queryResult;
 };
+
+const storage = multer.diskStorage({
+    destination: (req, file, cbl) => {
+        cbl(null, path.join('public', 'avatars'))
+    },
+    filename: (req, file, cbl) => {
+        const name = file.mimetype.split('/')[1];
+        Jimp.read(`${req.user.id}.${name}`, (err, lenna) => {
+            if (err) return err;
+            lenna
+              .resize(256, 256) // resize
+              .greyscale() // set greyscale
+              .write("lena-small-bw.jpg"); // save
+          });
+        cbl(null, `${req.user.id}.${name}`);
+    }});
+
+const filter = (req, file, cbl) => {
+    if (file.mimetype.startsWith('image/')) {
+        cbl(null, true);
+    } else {
+            cbk(console.log(400, 'Please, upload images only..'), false);
+          }        
+}
+
+export const uploadAvatars = multer({
+    storage: storage,
+    fileFilter: filter,
+    limits: {
+        fieldNameSize: 2 * 1024 * 1024,
+    }
+}).single('avatar')

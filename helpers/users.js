@@ -32,16 +32,9 @@ export const registerUser = async (user) => {
 export const updateAvatarImage = async(user, file) => {
     const id = user.id
 
-    const valid = Types.ObjectId.isValid(id);
-    
-    if (!valid) return res.status(404).json({"message": "Not found"});
-    
+    user.avatarURL = file.path.replace('public', '');
+
     const currentUser = await User.findByIdAndUpdate(id, user, {new: true,});
 
-    if (!currentUser) return res.status(404).json({"message": "Not found"});
-
-     user.avatarURL = file.path.replace('public', '');
-
-     currentUser.avatarURL = user.avatarURL
     return await currentUser.save()    
 }
