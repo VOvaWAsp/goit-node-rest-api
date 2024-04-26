@@ -6,8 +6,6 @@ import { Types } from 'mongoose';
 
 export const registration = async(req, res) => {
     const { newUser } = await registerUser(req.body);
-    console.log(req.body)
-    console.log(newUser)
     if (newUser === undefined) return res.status(404).json({ "message": "Email is already in use" })
     const { email, subscription, avatarURL } = newUser; 
     return res.status(201).json({
