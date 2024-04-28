@@ -4,8 +4,6 @@ import { Contact } from "../services/contactsServices.js";
 import HttpError from "./HttpError.js";
 import multer from "multer";
 import path from "path"
-import Jimp from "jimp";
-
 
 // export const tokens = (token) => {
 //     try {
@@ -52,28 +50,27 @@ export const verifyToken = async(req, res, next) => {
 
         console.log(id)
 
-        if (token === '') return res.status(401).json({ message: 'Not authorized' });
+        if (token === '') throw new HttpError(401, { "message": 'Not authorized' });
 
         if (!id) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            throw new HttpError(401, { "message": 'Unauthorized' }); 
         }
         
         const currentUser = await User.findById(id);
 
         if (!currentUser) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            throw new HttpError(401, { "message": 'Unauthorized' }); 
         }
 
 
         if (currentUser.token === null) {
-            return res.status(401).json({ message: 'Not authorized' });
+            throw new HttpError(401, { "message": 'Unauthorized' }); 
         }
 
         req.user = currentUser;
         next();
     } catch (error) {
-        console.error('Unauthorized');
-        return res.status(401).json({ message: 'Not authorized' });
+        throw new HttpError(401, { "message": 'Unauthorized' }); 
     }
 }
 
@@ -102,13 +99,6 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cbl) => {
         const name = file.mimetype.split('/')[1];
-        Jimp.read(`${req.user.id}.${name}`, (err, lenna) => {
-            if (err) return err;
-            lenna
-              .resize(256, 256) // resize
-              .greyscale() // set greyscale
-              .write("lena-small-bw.jpg"); // save
-          });
         cbl(null, `${req.user.id}.${name}`);
     }});
 

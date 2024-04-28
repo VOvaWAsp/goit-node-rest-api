@@ -1,6 +1,7 @@
 // import jwt from "jsonwebtoken";
 import gravatar from "gravatar"
 import path from "path"
+import Jimp from "jimp";
 
 import { User } from "../services/usersServices.js";
 import HttpError from "./HttpError.js";
@@ -30,11 +31,15 @@ export const registerUser = async (user) => {
 };
 
 export const updateAvatarImage = async(user, file) => {
-    const id = user.id
+    const id = user.id;
+    const name = file.mimetype.split('/')[1];
 
-    user.avatarURL = file.path.replace('public', '');
+        const lenna = await Jimp.read(file.path);
+        await lenna.resize(250, 250).write(`${id}.${name}`)
 
-    const currentUser = await User.findByIdAndUpdate(id, user, {new: true,});
+        user.avatarURL = file.path.replace('public', '');
 
-    return await currentUser.save()    
+        const currentUser = await User.findByIdAndUpdate(id, user, { new: true });
+
+        return currentUser;
 }
