@@ -4,6 +4,7 @@ import { Contact } from "../services/contactsServices.js";
 import HttpError from "./HttpError.js";
 import multer from "multer";
 import path from "path"
+import { v4 } from "uuid";
 
 // export const tokens = (token) => {
 //     try {
@@ -47,30 +48,13 @@ export const verifyToken = async(req, res, next) => {
     try {
         const token = req.headers.authorization?.startsWith('Bearer ') && req.headers.authorization.split(' ')[1];
         const { id } = await tokens(token);
-
-        console.log(id)
-
-        if (token === '') throw new HttpError(401, { "message": 'Not authorized' });
-
-        if (!id) {
-            throw new HttpError(401, { "message": 'Unauthorized' }); 
-        }
         
         const currentUser = await User.findById(id);
-
-        if (!currentUser) {
-            throw new HttpError(401, { "message": 'Unauthorized' }); 
-        }
-
-
-        if (currentUser.token === null) {
-            throw new HttpError(401, { "message": 'Unauthorized' }); 
-        }
 
         req.user = currentUser;
         next();
     } catch (error) {
-        throw new HttpError(401, { "message": 'Unauthorized' }); 
+        next(error)
     }
 }
 
@@ -99,7 +83,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cbl) => {
         const name = file.mimetype.split('/')[1];
-        cbl(null, `${req.user.id}.${name}`);
+        cbl(null, `${req.user.id}${v4()}.${name}`);
     }});
 
 const filter = (req, file, cbl) => {

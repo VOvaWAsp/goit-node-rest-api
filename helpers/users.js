@@ -2,6 +2,7 @@
 import gravatar from "gravatar"
 import path from "path"
 import Jimp from "jimp";
+import { v4 } from 'uuid';
 
 import { User } from "../services/usersServices.js";
 import HttpError from "./HttpError.js";
@@ -13,7 +14,7 @@ export const registerUser = async (user) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-        return HttpError(409, { message: "Email is already in use" });
+        throw HttpError(409, "Email is already in use" );
     }
 
     const newUser = await User.create({ ...user });
@@ -35,7 +36,7 @@ export const updateAvatarImage = async(user, file) => {
     const name = file.mimetype.split('/')[1];
 
         const lenna = await Jimp.read(file.path);
-        await lenna.resize(250, 250).write(`${id}.${name}`)
+        await lenna.resize(250, 250).write(`${id}${v4()}.${name}`)
 
         user.avatarURL = file.path.replace('public', '');
 

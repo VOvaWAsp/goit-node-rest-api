@@ -20,16 +20,16 @@ export const getOneContact = async (req, res, next) => {
 
     const valid = Types.ObjectId.isValid(id);
 
-    if (!valid) throw new HttpError(404, {"message": "Not found"})
+    if (!valid) throw HttpError(404, "Not found")
 
     const searchQuery = { _id: id, owner: req.user.id };
 
     const contact = await Contact.findOne(searchQuery);
 
-    if (!contact) throw new HttpError(404, {"message": "Not found"})
+    if (!contact) throw HttpError(404,  "Not found")
     res.json(contact);
 } catch(error) {
-    next();
+    next(error);
   }
 };
 
@@ -38,21 +38,21 @@ try {   const { id } = req.params;
 
     const valid = Types.ObjectId.isValid(id);
     
-    if (!valid)  throw new HttpError(404, {"message": "Not found"})
+    if (!valid)  throw HttpError(404, "Not found")
 
     const searchQuery = { _id: id, owner: req.user.id };
 
     const contact = await Contact.findOne(searchQuery);
 
-    if (!contact)  throw new HttpError(404, {"message": "Not found"})
+    if (!contact)  throw HttpError(404, "Not found")
 
     const removeContacted = await Contact.findByIdAndDelete(contact);
 
-    if (!removeContacted)  throw new HttpError(404, {"message": "Not found"})
+    if (!removeContacted)  throw HttpError(404, "Not found")
         
     res.json(removeContacted);
 } catch(error) {
-    next();
+    next(error);
   }
 };
 
@@ -76,7 +76,7 @@ createNewContcat.save();
         ownered,
     });
 } catch(error) {
-    next();
+    next(error);
   }
 };
 
@@ -86,25 +86,25 @@ const { id } = req.params;
 
 const valid = Types.ObjectId.isValid(id);
 
-if (!valid)  throw new HttpError(404, {"message": "Not found"})
+if (!valid)  throw HttpError(404, "Not found")
 
 if (Object.keys(req.body).length === 0) {
-    throw new HttpError(400, {"message": "Body must have at least one field"})
+    throw HttpError(400, "Body must have at least one field")
  }
 
  const searchQuery = { _id: id, owner: req.user.id };
 
  const contact = await Contact.findOne(searchQuery);
 
- if (!contact) throw new HttpError(404, {"message": "Not found"})
+ if (!contact) throw HttpError(404, "Not found")
 
 const updateContacts = await Contact.findByIdAndUpdate(contact, req.body, {new: true,});
 
-if (!updateContacts) throw new HttpError(404, {"message": "Not found"})
+if (!updateContacts) throw HttpError(404, "Not found")
 
 return res.json(updateContacts);
 } catch(error) {
-    next();
+    next(error);
   }
 };
 
@@ -113,20 +113,20 @@ export const updateStatusContact = async(req, res, next) => {
     
     const valid = Types.ObjectId.isValid(id);
     
-    if (!valid) throw new HttpError(404, {"message": "Not found"})
+    if (!valid) throw HttpError(404, "Not found")
 
     const searchQuery = { _id: id, owner: req.user.id };
 
  const contact = await Contact.findOne(searchQuery);
 
- if (!contact) throw new HttpError(404, {"message": "Not found"})
+ if (!contact) throw HttpError(404, "Not found")
     
     const updateFavorite = await Contact.findByIdAndUpdate(contact, req.body, {new: true,});
 
-    if (!updateFavorite) throw new HttpError(404, {"message": "Not found"})
+    if (!updateFavorite) throw HttpError(404, "Not found")
     
     return res.json(updateFavorite);
 } catch(error) {
-    next();
+    next(error);
   }
     };

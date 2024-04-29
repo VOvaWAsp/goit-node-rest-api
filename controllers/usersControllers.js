@@ -7,7 +7,7 @@ import HttpError from '../helpers/HttpError.js';
 
 export const registration = async(req, res, next) => {
   try { const { newUser } = await registerUser(req.body);
-    if (newUser === undefined) throw new HttpError(404, { "message": "Email is already in use"}); 
+    if (newUser === undefined) throw HttpError(404, "Email is already in use"); 
     const { email, subscription, avatarURL } = newUser; 
     return res.status(201).json({
         user: {
@@ -17,7 +17,7 @@ export const registration = async(req, res, next) => {
         }
     });
 } catch(error) {
-    next();
+    next(error);
   }
 }
 
@@ -25,11 +25,11 @@ export const login = async(req, res, next) => {
 try {    const email = req.body.email
     const user = await User.findOne({email})
 
-    if (!user) throw new HttpError(404, {"message": "Email or password is wrong"})
+    if (!user) throw HttpError(404, "Email or password is wrong")
 
     const valid = req.body.password === user.password
 
-    if (!valid)  throw new HttpError(404, {"message": "Email or password is wrong"})
+    if (!valid)  throw HttpError(404, "Email or password is wrong")
 
     const id = user.id
     const token = jwt.sign({id}, process.env.SECRET, {expiresIn: "1h"});
@@ -48,7 +48,7 @@ try {    const email = req.body.email
         }
     }))
 } catch(error) {
-    next();
+    next(error);
   }
 }
 
@@ -58,7 +58,7 @@ export const logout = async(req, res, next) => {
    await token.save()
    res.sendStatus(204);
 } catch(error) {
-    next();
+    next(error);
   }
 }
 
@@ -70,7 +70,7 @@ export const current = async(req, res, next) => {
     subscription
    })
 } catch(error) {
-    next();
+    next(error);
   }
 }
 
@@ -79,17 +79,17 @@ export const updateSubscription = async(req, res, next) => {
     
     const valid = Types.ObjectId.isValid(id);
     
-    if (!valid) throw new HttpError(404, {"message": "Not found"})
+    if (!valid) throw HttpError(404, "Not found")
     
     const updateSubscriptions = await User.findByIdAndUpdate(id, req.body, {new: true,});
 
-    if (!updateSubscriptions) throw new HttpError(404, {"message": "Not found"})
+    if (!updateSubscriptions) throw HttpError(404, "Not found")
 
     await updateSubscriptions.save();
     
     return res.json(updateSubscriptions);
 } catch(error) {
-    next();
+    next(error);
   }
 }
 
@@ -99,6 +99,6 @@ export const updateAvatar = async(req, res, next) => {
          user,
      }); 
     } catch(error) {
-        next();
+        next(error);
       }
 }
