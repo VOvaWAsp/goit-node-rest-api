@@ -1,4 +1,8 @@
 import jwt from 'jsonwebtoken';
+import sgMail from '@sendgrid/mail'
+import path from "path"
+import pug from 'pug';
+import { convert } from 'html-to-text';
 
 import { User } from "../services/usersServices.js"
 import { registerUser, updateAvatarImage } from '../helpers/users.js';
@@ -26,6 +30,8 @@ try {    const email = req.body.email
     const user = await User.findOne({email})
 
     if (!user) throw HttpError(404, "Email or password is wrong")
+
+    if (user.verify === false) throw HttpError(404, "need verifed")
 
     const valid = req.body.password === user.password
 
@@ -101,4 +107,64 @@ export const updateAvatar = async(req, res, next) => {
     } catch(error) {
         next(error);
       }
+}
+
+export const verificationToken = async(req, res, next) => {
+  try {
+    const userId = await req.params.verificationToken;
+
+  if (!userId) throw HttpError(404, 'User not found')
+
+  const searchQuery = { verificationToken: userId };
+
+  const contact = await User.findOne(searchQuery);
+
+  if (!contact) throw HttpError(404,  'User not found')
+
+  contact.verificationToken = false;
+  contact.verify = true
+
+  contact.save()
+
+  res.json({"message": 'Verification successful'});
+  } catch(error) {
+    next(error)
+  }
+}
+
+export const verify = async(req, res, next) => {
+  try {
+    const { email } = req.body
+
+    if(!email) throw HttpError(400, "missing required field email")
+
+    const contact = await User.findOne({email});
+
+    if(contact.verify === true) throw HttpError(400, "Verification has already been passed")
+
+    const html = pug.renderFile(path.join(process.cwd(), "confirmEmail", "confirmEmail.pug"), {
+      name: contact.id,
+      token: contact.verificationToken
+    });
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+const msg = {
+  to: email, // Change to your recipient
+  from: 'brainaxin@gmail.com', // Change to your verified sender
+  subject: 'Sending with SendGrid is Fun',
+  text: convert(html),
+  html: html,
+}
+sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent')
+  })
+  .catch((error) => {
+    next(error)
+  })
+  res.json({"message": "Verification email sent"})
+  } catch(error) {
+    next(error);
+  }
 }
