@@ -5,9 +5,10 @@ import pug from 'pug';
 import { convert } from 'html-to-text';
 
 import { User } from "../services/usersServices.js"
-import { registerUser, updateAvatarImage } from '../helpers/users.js';
+import { message, updateAvatarImage } from '../helpers/users.js';
 import { Types } from 'mongoose';
 import HttpError from '../helpers/HttpError.js';
+import { registerUser } from '../helpers/midellwars.js';
 
 export const registration = async(req, res, next) => {
   try { const { newUser } = await registerUser(req.body);
@@ -121,7 +122,7 @@ export const verificationToken = async(req, res, next) => {
 
   if (!contact) throw HttpError(404,  'User not found')
 
-  contact.verificationToken = false;
+  contact.verificationToken = "";
   contact.verify = true
 
   contact.save()
@@ -142,27 +143,8 @@ export const verify = async(req, res, next) => {
 
     if(contact.verify === true) throw HttpError(400, "Verification has already been passed")
 
-    const html = pug.renderFile(path.join(process.cwd(), "confirmEmail", "confirmEmail.pug"), {
-      name: contact.id,
-      token: contact.verificationToken
-    });
+    message(contact.id, contact.verificationToken, email)
 
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-const msg = {
-  to: email, // Change to your recipient
-  from: 'brainaxin@gmail.com', // Change to your verified sender
-  subject: 'Sending with SendGrid is Fun',
-  text: convert(html),
-  html: html,
-}
-sgMail
-  .send(msg)
-  .then(() => {
-    console.log('Email sent')
-  })
-  .catch((error) => {
-    next(error)
-  })
   res.json({"message": "Verification email sent"})
   } catch(error) {
     next(error);
