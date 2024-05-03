@@ -5,7 +5,7 @@ import pug from 'pug';
 import { convert } from 'html-to-text';
 
 import { User } from "../services/usersServices.js"
-import { message, updateAvatarImage } from '../helpers/users.js';
+import { sendMessages, updateAvatarImage } from '../helpers/users.js';
 import { Types } from 'mongoose';
 import HttpError from '../helpers/HttpError.js';
 import { registerUser } from '../helpers/midellwars.js';
@@ -143,7 +143,7 @@ export const verify = async(req, res, next) => {
 
     if(contact.verify === true) throw HttpError(400, "Verification has already been passed")
 
-    message(contact.id, contact.verificationToken, email)
+   await sendMessages(contact.id, contact.verificationToken, email)
 
   res.json({"message": "Verification email sent"})
   } catch(error) {

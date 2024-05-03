@@ -5,7 +5,7 @@ import HttpError from "./HttpError.js";
 import multer from "multer";
 import path from "path"
 import { v4 } from "uuid";
-import { message } from "./users.js";
+import { sendMessages } from "./users.js";
 import sgMail from '@sendgrid/mail'
 import pug from "pug"
 import { convert } from 'html-to-text';
@@ -92,7 +92,7 @@ export const registerUser = async (user) => {
 
     const newUser = await User.create({ ...user });
 
-  message(newUser.id, newUser.verificationToken, email)
+    await sendMessages(newUser.id, newUser.verificationToken, email)
 
     // const id = newUser.id;
     // const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: "1h" });
