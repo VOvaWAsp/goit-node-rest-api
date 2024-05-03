@@ -1,5 +1,5 @@
 import express from "express"
-import { current, login, logout, registration, updateAvatar, updateSubscription } from "../controllers/usersControllers.js";
+import { current, login, logout, registration, updateAvatar, updateSubscription, verificationToken, verify } from "../controllers/usersControllers.js";
 import { uploadAvatars, verifyToken } from "../helpers/midellwars.js";
 import validateBody from "../helpers/validateBody.js";
 import { updateSubscriptionSchema, usersSchema } from "../schemas/contactsSchemas.js";
@@ -8,6 +8,8 @@ const usersRouter = express.Router();
 
 usersRouter.post('/register', validateBody(usersSchema), registration)
 usersRouter.post('/login', validateBody(usersSchema), login)
+usersRouter.get('/verify/:verificationToken', verificationToken);
+usersRouter.post('/verify', verify)
 usersRouter.post('/logout', verifyToken, logout)
 usersRouter.get('/current', verifyToken, current)
 usersRouter.patch('/', validateBody(updateSubscriptionSchema), verifyToken, updateSubscription)

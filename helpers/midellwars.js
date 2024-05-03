@@ -5,35 +5,11 @@ import HttpError from "./HttpError.js";
 import multer from "multer";
 import path from "path"
 import { v4 } from "uuid";
-
-// export const tokens = (token) => {
-//     try {
-//         const id = jwt.verify(token, process.env.SECRET);
-//         return id;
-//     } catch (error) {
-//         console.error({ message: 'Unauthorized' });
-//     }
-// }
-
-// export const verifyToken = async(req, res, next) => {
-//     const token = await
-//     req.headers.authorization?.startsWith('Bearer ') && req.headers.authorization.split(' ')[1];
-//     const {id} = await tokens(token);
-
-//     console.log(id)
-
-//     if (!id) {
-//         return res.status(401).json({ message: 'Unauthorized1' });
-//     }
-//         const currentUser = await User.findById(id);
-
-//         if (!currentUser) {
-//             return res.status(401).json({ message: 'Unauthorized2' });
-//         }
-
-//         req.user = currentUser;
-//         next();
-// }
+import { sendMessages } from "./users.js";
+import sgMail from '@sendgrid/mail'
+import pug from "pug"
+import { convert } from 'html-to-text';
+import gravatar from "gravatar"
 
 export const tokens = (token, res) => {
     try {
@@ -101,3 +77,31 @@ export const uploadAvatars = multer({
         fieldNameSize: 2 * 1024 * 1024,
     }
 }).single('avatar')
+
+export const registerUser = async (user) => {
+    const { email } = user;
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+        throw HttpError(409, "Email is already in use" );
+    }
+
+    user.verificationToken = v4();
+
+
+    const newUser = await User.create({ ...user });
+
+    await sendMessages(newUser.id, newUser.verificationToken, email)
+
+    // const id = newUser.id;
+    // const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: "1h" });
+    // newUser.token = token;
+
+    newUser.avatarURL = gravatar.url(email, {s: '200', r: 'pg', d: '404'});
+
+    await newUser.save();
+
+    newUser.password = undefined;
+    return { newUser };
+};

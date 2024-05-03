@@ -1,34 +1,33 @@
 // import jwt from "jsonwebtoken";
-import gravatar from "gravatar"
 import path from "path"
 import Jimp from "jimp";
 import { v4 } from 'uuid';
+import nodemailer from "nodemailer"
+import sgMail from '@sendgrid/mail'
+import pug from "pug"
+import { convert } from 'html-to-text';
 
 import { User } from "../services/usersServices.js";
 import HttpError from "./HttpError.js";
 import { Types } from "mongoose";
 
-export const registerUser = async (user) => {
-    const { email } = user;
+export const sendMessages = async (name, tokens, email) => {
+        const html = pug.renderFile(path.join(process.cwd(), "confirmEmail", "confirmEmail.pug"), {
+            name: name,
+            token: tokens
+        });
 
-    const existingUser = await User.findOne({ email });
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-    if (existingUser) {
-        throw HttpError(409, "Email is already in use" );
-    }
+        const msg = {
+            to: email,
+            from: 'brainaxin@gmail.com',
+            subject: 'Sending with SendGrid is Fun',
+            text: convert(html),
+            html: html,
+        };
 
-    const newUser = await User.create({ ...user });
-
-    // const id = newUser.id;
-    // const token = jwt.sign({ id }, process.env.SECRET, { expiresIn: "1h" });
-    // newUser.token = token;
-
-    newUser.avatarURL = gravatar.url(email, {s: '200', r: 'pg', d: '404'});
-
-    await newUser.save();
-
-    newUser.password = undefined;
-    return { newUser };
+        return sgMail.send(msg);
 };
 
 export const updateAvatarImage = async(user, file) => {
